@@ -1,0 +1,186 @@
+@import "tailwindcss";
+
+:root {
+  --bg: #f6f5f1;
+  --ink: #1a1a1a;
+  --muted: #6b6b66;
+  --line: #d9d7d0;
+  --font-serif: var(--font-cormorant);
+  --font-sans: var(--font-jost);
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --font-serif: var(--font-cormorant);
+  --font-sans: var(--font-jost);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-sans), system-ui, sans-serif;
+  font-weight: 300;
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: var(--ink);
+  color: var(--bg);
+}
+
+/* Tipografía de display */
+.display-serif {
+  font-family: var(--font-serif), Georgia, serif;
+  font-style: italic;
+  font-weight: 300;
+  line-height: 0.95;
+  letter-spacing: -0.01em;
+}
+
+.display-sans {
+  font-family: var(--font-sans), system-ui, sans-serif;
+  font-weight: 200;
+  text-transform: uppercase;
+  line-height: 0.95;
+  letter-spacing: 0.02em;
+}
+
+.eyebrow {
+  font-family: var(--font-sans), system-ui, sans-serif;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.22em;
+  font-size: 0.7rem;
+}
+
+.btn-outline {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--ink);
+  padding: 0.85rem 1.75rem;
+  font-family: var(--font-sans), system-ui, sans-serif;
+  font-weight: 500;
+  font-size: 0.72rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  transition: background 0.3s ease, color 0.3s ease;
+}
+.btn-outline:hover {
+  background: var(--ink);
+  color: var(--bg);
+}
+
+/* Botón MENU con doble borde, estilo referencia */
+.menu-btn {
+  font-family: var(--font-sans), system-ui, sans-serif;
+  font-weight: 400;
+  font-size: 0.85rem;
+  letter-spacing: 0.08em;
+  padding: 0.15rem 0.5rem;
+  border: 1px solid var(--ink);
+  box-shadow: 0 0 0 2px var(--bg), 0 0 0 3px var(--ink);
+  background: var(--bg);
+  transition: background 0.3s ease, color 0.3s ease;
+}
+.menu-btn:hover {
+  background: var(--ink);
+  color: var(--bg);
+}
+
+/* Foto monocroma con leve zoom en hover */
+.photo-frame {
+  overflow: hidden;
+  background: #e6e4dd;
+}
+.photo-frame img {
+  transition: transform 1.2s cubic-bezier(0.19, 1, 0.22, 1);
+  will-change: transform;
+}
+.photo-frame:hover img {
+  transform: scale(1.04);
+}
+
+.mono img {
+  filter: grayscale(1);
+}
+
+/* Inputs del formulario público */
+.field {
+  width: 100%;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  padding: 0.9rem 0;
+  font-size: 0.95rem;
+  outline: none;
+  transition: border-color 0.3s ease;
+}
+.field:focus {
+  border-bottom-color: var(--ink);
+}
+.field::placeholder {
+  color: var(--muted);
+}
+
+/* Panel de administración */
+.admin-input {
+  width: 100%;
+  border: 1px solid var(--line);
+  background: #fff;
+  padding: 0.6rem 0.75rem;
+  font-size: 0.9rem;
+  border-radius: 4px;
+  outline: none;
+}
+.admin-input:focus {
+  border-color: var(--ink);
+}
+.admin-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  border-radius: 4px;
+  padding: 0.55rem 1rem;
+  font-size: 0.85rem;
+  font-weight: 500;
+  background: var(--ink);
+  color: #fff;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+.admin-btn:hover {
+  opacity: 0.85;
+}
+.admin-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.admin-btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  border-radius: 4px;
+  padding: 0.45rem 0.8rem;
+  font-size: 0.8rem;
+  font-weight: 500;
+  border: 1px solid var(--line);
+  background: #fff;
+  cursor: pointer;
+}
+.admin-btn-ghost:hover {
+  border-color: var(--ink);
+}
+.admin-btn-danger {
+  color: #b42318;
+}
+.admin-btn-danger:hover {
+  border-color: #b42318;
+}

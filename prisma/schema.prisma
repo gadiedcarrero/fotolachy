@@ -1,0 +1,88 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+/// Configuración global del sitio (una sola fila, id = 1)
+model SiteSettings {
+  id             Int     @id @default(1)
+  siteName       String  @default("Foto Lachy")
+  tagline        String  @default("Fotografía editorial de bodas")
+  heroLine1      String  @default("Fotografía editorial")
+  heroLine2      String  @default("DE BODAS")
+  heroLine3      String  @default("con alma")
+  heroSubtitle   String  @default("PERMITIENDO QUE TU HISTORIA SE CUENTE SOLA")
+  heroPhotoUrl   String? // URL de la foto del hero
+  introQuote     String  @default("La naturaleza guarda la clave de nuestra satisfacción estética, intelectual, cognitiva e incluso espiritual.")
+  introText      String  @default("Fotografiamos bodas en todo el mundo con una mirada editorial, honesta y atemporal. Cada historia se cuenta con luz natural, gesto y silencio.")
+  bookingEnabled Boolean @default(true)
+  bookingTitle   String  @default("Reservas")
+  bookingText    String  @default("Agenda abierta para 2026/27")
+  bookingCta     String  @default("CONSULTA TU FECHA")
+  bookingDelayMs Int     @default(4000)
+  aboutTitle     String  @default("Sobre nosotros")
+  aboutText      String  @default("Somos un estudio de fotografía de bodas con base en Bogotá y disponibilidad para viajar a cualquier destino. Creemos en la fotografía que no interrumpe, que observa y que perdura.")
+  aboutPhotoUrl  String?
+  contactEmail   String  @default("hola@tudominio.com")
+  contactText    String  @default("Cuéntanos sobre tu boda. Respondemos en menos de 48 horas.")
+  instagramUrl   String  @default("https://instagram.com/")
+  pressText      String  @default("Publicados en Vogue, Elle y Lane Magazine")
+  footerText     String  @default("© Todos los derechos reservados")
+  updatedAt      DateTime @updatedAt
+}
+
+/// Sección del sitio (aparece en el menú y en la home). Ej: Bodas reales, Portafolio, Editorial...
+model Section {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  title       String
+  subtitle    String?
+  description String?
+  order       Int      @default(0)
+  showInMenu  Boolean  @default(true)
+  showInHome  Boolean  @default(true)
+  /// Presentación en la home:
+  ///  "stories"  = scroll horizontal de historias (sub-galerías), cada una con su propia página
+  ///  "vertical" = cuadrícula de fotos en vertical dentro de la home
+  ///  "card"     = solo tarjeta que lleva a su página
+  layout      String   @default("card")
+  coverUrl    String? // foto que se muestra al pasar el mouse en el menú / tarjeta
+  photos      Photo[]
+  /// Sección padre (si esta sección es una "historia" dentro de otra)
+  parentId    String?
+  parent      Section?  @relation("SectionChildren", fields: [parentId], references: [id], onDelete: Cascade)
+  children    Section[] @relation("SectionChildren")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Photo {
+  id        String   @id @default(cuid())
+  url       String
+  alt       String   @default("")
+  width     Int      @default(1200)
+  height    Int      @default(1600)
+  order     Int      @default(0)
+  sectionId String?
+  section   Section? @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+}
+
+/// Mensajes del formulario de contacto
+model Inquiry {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  eventType String?
+  location  String?
+  date      String?
+  planner   String?
+  instagram String?
+  message   String?
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
