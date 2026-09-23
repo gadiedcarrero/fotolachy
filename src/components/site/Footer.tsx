@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 
 type Props = {
@@ -13,8 +14,10 @@ export default function Footer({ siteName, email, instagramUrl, footerText, link
     <footer className="border-t border-line px-6 md:px-16 py-12">
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
         <div>
-          <p className="font-sans text-[0.8rem] font-medium tracking-[0.35em] uppercase">{siteName}</p>
-          <a href={`mailto:${email}`} className="mt-3 block font-serif italic text-xl hover:opacity-60 transition-opacity">
+          <Link href="/" aria-label={siteName} className="inline-block">
+            <Image src="/logo.png" alt={siteName} width={1200} height={295} className="h-12 w-auto" />
+          </Link>
+          <a href={`mailto:${email}`} className="mt-4 block font-serif italic text-xl hover:opacity-60 transition-opacity">
             {email}
           </a>
         </div>

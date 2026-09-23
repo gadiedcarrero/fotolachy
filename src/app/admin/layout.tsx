@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { cookies } from "next/headers";
 import { SESSION_COOKIE, isValidSession } from "@/lib/auth";
@@ -23,7 +24,8 @@ export default async function AdminLayout({ children }: LayoutProps<"/admin">) {
     <div className="min-h-screen bg-[#f2f1ed] text-ink font-sans font-normal">
       <div className="flex min-h-screen">
         <aside className="hidden md:flex w-60 shrink-0 flex-col border-r border-line bg-white px-5 py-6">
-          <p className="text-[0.7rem] font-medium tracking-[0.3em] uppercase text-muted">Panel</p>
+          <Image src="/logo.png" alt="Foto Lachy" width={1200} height={295} className="h-10 w-auto" />
+          <p className="mt-3 text-[0.7rem] font-medium tracking-[0.3em] uppercase text-muted">Panel</p>
           <nav className="mt-6 flex flex-col gap-1">
             {NAV.map((n) => (
               <Link key={n.href} href={n.href} className="rounded px-3 py-2 text-sm hover:bg-[#f2f1ed]">

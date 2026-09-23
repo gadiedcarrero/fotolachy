@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import MenuOverlay, { type MenuItem } from "./MenuOverlay";
@@ -15,12 +16,16 @@ export default function Header({ siteName, items }: Props) {
   return (
     <>
       <header className="fixed inset-x-0 top-0 z-50 flex items-center justify-between px-5 py-5 md:px-8 mix-blend-difference text-white">
-        <Link
-          href="/"
-          className="font-sans text-[0.8rem] font-medium tracking-[0.35em] uppercase"
-          onClick={() => setOpen(false)}
-        >
-          {siteName}
+        {/* Logo en blanco: con mix-blend-difference se ve oscuro sobre fondo claro y claro sobre fotos oscuras */}
+        <Link href="/" onClick={() => setOpen(false)} aria-label={siteName} className="block">
+          <Image
+            src="/logo-white.png"
+            alt={siteName}
+            width={1200}
+            height={295}
+            priority
+            className="h-9 md:h-11 w-auto"
+          />
         </Link>
         <button
           type="button"
