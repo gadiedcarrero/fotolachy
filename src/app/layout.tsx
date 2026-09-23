@@ -26,8 +26,10 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
+  // suppressHydrationWarning: extensiones del navegador (LanguageTool, etc.) añaden atributos
+  // a <html> antes de que React hidrate y provocan un falso aviso de hydration mismatch.
   return (
-    <html lang="es" className={`${cormorant.variable} ${jost.variable} h-full antialiased`}>
+    <html lang="es" className={`${cormorant.variable} ${jost.variable} h-full antialiased`} suppressHydrationWarning>
       <body className="min-h-full flex flex-col">{children}</body>
     </html>
   );
