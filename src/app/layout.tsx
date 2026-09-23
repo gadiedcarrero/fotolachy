@@ -18,10 +18,18 @@ const jost = Jost({
 
 /** Título y descripción de la pestaña, tomados de los ajustes del panel. */
 export async function generateMetadata(): Promise<Metadata> {
-  const s = await getSettings();
+  let siteName = "Foto Lachy";
+  let description = "Fotografía editorial de bodas";
+  try {
+    const s = await getSettings();
+    siteName = s.siteName;
+    description = s.tagline;
+  } catch {
+    // Sin base de datos (por ejemplo al prerenderizar la 404 en el build) se usan los valores por defecto
+  }
   return {
-    title: { default: s.siteName, template: `%s · ${s.siteName}` },
-    description: s.tagline,
+    title: { default: siteName, template: `%s · ${siteName}` },
+    description,
   };
 }
 
