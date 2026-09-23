@@ -41,6 +41,7 @@ const TEXT_FIELDS = [
   "siteName", "tagline", "heroLine1", "heroLine2", "heroLine3", "heroSubtitle",
   "introQuote", "introText", "bookingTitle", "bookingText", "bookingCta",
   "aboutTitle", "aboutText", "contactEmail", "contactText", "instagramUrl", "pressText", "footerText",
+  "whatsappNumber", "whatsappMessage",
 ] as const;
 
 export async function updateSettings(_prev: ActionState, formData: FormData): Promise<ActionState> {

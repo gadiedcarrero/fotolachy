@@ -4,9 +4,9 @@ import { useActionState } from "react";
 import { sendInquiry, type ContactState } from "@/app/actions/contact";
 import Reveal from "./Reveal";
 
-type Props = { title: string; text: string; email: string };
+type Props = { title: string; text: string; email: string; whatsappHref?: string | null };
 
-export default function ContactForm({ title, text, email }: Props) {
+export default function ContactForm({ title, text, email, whatsappHref }: Props) {
   const [state, action, pending] = useActionState<ContactState, FormData>(sendInquiry, null);
 
   return (
@@ -19,6 +19,11 @@ export default function ContactForm({ title, text, email }: Props) {
           <a href={`mailto:${email}`} className="mt-6 inline-block font-serif italic text-xl hover:opacity-60 transition-opacity">
             {email}
           </a>
+          {whatsappHref && (
+            <a href={whatsappHref} target="_blank" rel="noreferrer" className="btn-outline mt-6 block w-fit">
+              Escríbenos por WhatsApp
+            </a>
+          )}
         </Reveal>
 
         <Reveal className="md:col-span-7" delay={0.1}>

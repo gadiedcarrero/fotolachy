@@ -8,6 +8,7 @@ import SectionCards from "@/components/site/SectionCards";
 import About from "@/components/site/About";
 import ContactForm from "@/components/site/ContactForm";
 import Footer from "@/components/site/Footer";
+import WhatsAppButton, { whatsappLink } from "@/components/site/WhatsAppButton";
 import Reveal from "@/components/site/Reveal";
 import { getSections, getSettings, sectionCover } from "@/lib/data";
 import type { MenuItem } from "@/components/site/MenuOverlay";
@@ -119,8 +120,14 @@ export default async function HomePage() {
           pressText={settings.pressText}
         />
 
-        <ContactForm title="Consulta tu fecha" text={settings.contactText} email={settings.contactEmail} />
+        <ContactForm
+          title="Consulta tu fecha"
+          text={settings.contactText}
+          email={settings.contactEmail}
+          whatsappHref={whatsappLink(settings.whatsappNumber, settings.whatsappMessage)}
+        />
       </main>
+      <WhatsAppButton number={settings.whatsappNumber} message={settings.whatsappMessage} />
       <Footer
         siteName={settings.siteName}
         email={settings.contactEmail}

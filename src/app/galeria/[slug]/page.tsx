@@ -4,6 +4,7 @@ import Header from "@/components/site/Header";
 import GridGallery from "@/components/site/GridGallery";
 import SectionCards from "@/components/site/SectionCards";
 import Footer from "@/components/site/Footer";
+import WhatsAppButton from "@/components/site/WhatsAppButton";
 import Reveal from "@/components/site/Reveal";
 import { getSectionBySlug, getSections, getSettings, sectionCover } from "@/lib/data";
 import type { MenuItem } from "@/components/site/MenuOverlay";
@@ -68,6 +69,7 @@ export default async function GalleryPage({ params }: PageProps<"/galeria/[slug]
           <p className="px-6 md:px-16 mt-16 text-muted">Aún no hay fotos en esta galería.</p>
         )}
       </main>
+      <WhatsAppButton number={settings.whatsappNumber} message={settings.whatsappMessage} />
       <Footer
         siteName={settings.siteName}
         email={settings.contactEmail}

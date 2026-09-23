@@ -39,6 +39,16 @@ export default function SettingsForm({ s }: { s: SiteSettings }) {
         <Field label="Instagram (URL)" name="instagramUrl" value={s.instagramUrl} />
       </Group>
 
+      <Group title="WhatsApp">
+        <Field
+          label="Número de WhatsApp"
+          name="whatsappNumber"
+          value={s.whatsappNumber}
+          hint="Con código de país y solo dígitos, ej: 573001234567. Déjalo vacío para ocultar el botón."
+        />
+        <Field label="Mensaje inicial" name="whatsappMessage" value={s.whatsappMessage} hint="Texto que aparece escrito al abrir el chat." />
+      </Group>
+
       <Group title="Hero (portada)">
         <Field label="Línea 1 (cursiva)" name="heroLine1" value={s.heroLine1} />
         <Field label="Línea 2 (mayúsculas)" name="heroLine2" value={s.heroLine2} />

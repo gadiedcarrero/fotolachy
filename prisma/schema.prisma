@@ -30,6 +30,9 @@ model SiteSettings {
   contactEmail   String  @default("hola@tudominio.com")
   contactText    String  @default("Cuéntanos sobre tu boda. Respondemos en menos de 48 horas.")
   instagramUrl   String  @default("https://instagram.com/")
+  /// Número de WhatsApp con código de país, solo dígitos (ej: 573001234567). Vacío = sin botón.
+  whatsappNumber  String  @default("")
+  whatsappMessage String  @default("Hola, me gustaría consultar disponibilidad para mi boda.")
   pressText      String  @default("Publicados en Vogue, Elle y Lane Magazine")
   footerText     String  @default("© Todos los derechos reservados")
   updatedAt      DateTime @updatedAt
