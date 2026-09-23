@@ -55,7 +55,7 @@ export default function BookingPopup({ enabled, title, text, cta, delayMs, href 
       ref={box}
       role="dialog"
       aria-label={title}
-      className="fixed bottom-4 right-4 z-30 w-[calc(100%-2rem)] max-w-[460px] bg-white shadow-[0_20px_60px_rgba(0,0,0,0.12)] px-6 pt-8 pb-5 text-center"
+      className="fixed bottom-24 right-4 z-30 w-[calc(100%-2rem)] max-w-[460px] bg-white shadow-[0_20px_60px_rgba(0,0,0,0.12)] px-6 pt-8 pb-5 text-center"
     >
       <button
         type="button"
