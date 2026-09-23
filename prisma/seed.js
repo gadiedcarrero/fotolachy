@@ -87,6 +87,15 @@ async function upsertSection(s, order, parentId = null) {
 }
 
 async function main() {
+  // En despliegues se ejecuta en cada build: solo carga los ejemplos si la base está vacía
+  // (o si se pasa --force), para no recrear secciones que el fotógrafo haya borrado.
+  const force = process.argv.includes("--force");
+  const existing = await prisma.section.count();
+  if (existing > 0 && !force) {
+    console.log(`La base ya tiene ${existing} secciones; no se cargan datos de ejemplo (usa --force para forzar).`);
+    return;
+  }
+
   await prisma.siteSettings.upsert({
     where: { id: 1 },
     update: {},

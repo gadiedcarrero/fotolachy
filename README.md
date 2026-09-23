@@ -28,14 +28,16 @@ Sitio web editorial para fotógrafo de bodas, inspirado en daniloandsharon.com, 
 
 ## Stack
 
-Next.js 16 (App Router) · React 19 · TypeScript · Tailwind CSS 4 · Prisma 6 + SQLite · GSAP · sharp.
+Next.js 16 (App Router) · React 19 · TypeScript · Tailwind CSS 4 · Prisma 6 + Postgres · Vercel Blob (fotos) · GSAP · sharp.
 
 ## Puesta en marcha
 
+Necesitas una base de datos Postgres. La opción más simple es crear una gratis en [Neon](https://neon.tech) y copiar su cadena de conexión.
+
 ```bash
 npm install
-cp .env.example .env     # y cambia ADMIN_PASSWORD y AUTH_SECRET
-npm run setup            # crea la base de datos y carga datos de ejemplo (placeholders)
+cp .env.example .env     # pon tu DATABASE_URL y cambia ADMIN_PASSWORD y AUTH_SECRET
+npm run setup            # crea las tablas y carga datos de ejemplo (placeholders)
 npm run dev              # http://localhost:3000
 ```
 
@@ -45,17 +47,17 @@ Panel: http://localhost:3000/admin (contraseña por defecto en `.env`: `admin123
 
 | Variable | Descripción |
 | --- | --- |
-| `DATABASE_URL` | Ruta del SQLite. Por defecto `file:../data/db.sqlite` (relativa a `prisma/`). |
+| `DATABASE_URL` | Cadena de conexión Postgres. |
 | `ADMIN_PASSWORD` | Contraseña del panel. |
 | `AUTH_SECRET` | Cadena larga aleatoria para firmar la cookie de sesión. |
-| `UPLOAD_DIR` | Carpeta donde se guardan las fotos subidas. Por defecto `./data/uploads`. |
+| `BLOB_READ_WRITE_TOKEN` | Token de Vercel Blob. Si existe, las fotos se guardan en Blob; si no, en disco local. |
+| `UPLOAD_DIR` | Carpeta local para fotos cuando no hay Blob. Por defecto `./data/uploads`. |
 
 ## Datos y fotos
 
-- La base de datos y las fotos subidas viven en `data/` (ignorada por git). Haz copia de esa carpeta para respaldar el sitio.
-- Las fotos subidas se redimensionan a máximo 2400px y se convierten a WebP.
-- Se sirven desde `/media/<archivo>` mediante un route handler, por lo que funcionan también en producción sin reconstruir.
-- Los datos de ejemplo usan imágenes de `picsum.photos`. Al subir fotos reales, borra las de ejemplo desde el panel.
+- Las fotos se reducen en el navegador (máx. 2400px) antes de subirse, y en el servidor se convierten a WebP.
+- En Vercel se guardan en Vercel Blob con URL pública. En local se guardan en `data/uploads` y se sirven por `/media/<archivo>`.
+- Los datos de ejemplo usan imágenes de `picsum.photos`. El seed solo se ejecuta si la base está vacía (`npm run db:seed:force` para forzarlo).
 
 ## Scripts
 
@@ -64,8 +66,9 @@ Panel: http://localhost:3000/admin (contraseña por defecto en `.env`: `admin123
 | `npm run dev` | Servidor de desarrollo. |
 | `npm run build` / `npm start` | Build y servidor de producción. |
 | `npm run db:push` | Crea o actualiza las tablas según `prisma/schema.prisma`. |
-| `npm run db:seed` | Carga los datos de ejemplo. |
+| `npm run db:seed` | Carga los datos de ejemplo si la base está vacía. |
 | `npm run db:studio` | Abre Prisma Studio para ver la base de datos. |
+| `npm run vercel-build` | Lo que ejecuta Vercel: genera Prisma, aplica el esquema, siembra si hace falta y construye. |
 
 ## Estructura
 
@@ -75,9 +78,17 @@ src/app/           páginas (home, galería, admin, api/upload, media)
 src/components/    site/ (público) y admin/ (panel)
 src/lib/           prisma, auth, media, data, gsap
 src/proxy.ts       protege /admin
-data/              db.sqlite y uploads (no versionado)
+data/              fotos subidas en local (no versionado)
 ```
 
-## Despliegue
+## Despliegue en Vercel
 
-Necesita un servidor Node con disco persistente (VPS, Railway, Render, Fly.io…) porque usa SQLite y guarda las fotos en disco. En plataformas sin disco persistente (Vercel) habría que cambiar SQLite por Postgres y los uploads por un bucket (S3, R2, Vercel Blob).
+1. En [vercel.com/new](https://vercel.com/new) importa el repositorio `gadiedcarrero/fotolachy`. Deja el framework en Next.js.
+2. Antes de desplegar, en **Storage** del proyecto:
+   - **Create Database → Neon (Postgres)**. Vercel añade `DATABASE_URL` sola.
+   - **Create → Blob**. Vercel añade `BLOB_READ_WRITE_TOKEN` sola.
+3. En **Settings → Environment Variables** añade `ADMIN_PASSWORD` y `AUTH_SECRET` (una cadena larga aleatoria).
+4. Despliega. El build ejecuta `vercel-build`: crea las tablas y carga los datos de ejemplo la primera vez.
+5. Entra en `https://<tu-proyecto>.vercel.app/admin` con la contraseña y sube las fotos reales.
+
+Cada `git push` a `main` vuelve a desplegar automáticamente.

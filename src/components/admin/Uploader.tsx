@@ -2,10 +2,15 @@
 
 import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { uploadImage } from "@/lib/client-image";
 
 type Props = { sectionId: string };
 
-/** Sube varias fotos a la vez (drag & drop o selector) a una sección. */
+/**
+ * Sube varias fotos a una sección (drag & drop o selector).
+ * Cada foto se reduce en el navegador y se envía en una petición propia,
+ * para no superar el límite de tamaño por petición de Vercel.
+ */
 export default function Uploader({ sectionId }: Props) {
   const router = useRouter();
   const input = useRef<HTMLInputElement>(null);
@@ -17,21 +22,24 @@ export default function Uploader({ sectionId }: Props) {
     const list = Array.from(files).filter((f) => f.type.startsWith("image/"));
     if (list.length === 0) return;
     setBusy(true);
+    let done = 0;
+    const errors: string[] = [];
     try {
-      // Subimos en lotes de 4 para no saturar la memoria del servidor
-      for (let i = 0; i < list.length; i += 4) {
-        const batch = list.slice(i, i + 4);
-        setProgress(`Subiendo ${Math.min(i + batch.length, list.length)} de ${list.length}…`);
-        const fd = new FormData();
-        fd.append("sectionId", sectionId);
-        batch.forEach((f) => fd.append("files", f));
-        const res = await fetch("/api/upload", { method: "POST", body: fd });
-        if (!res.ok) throw new Error((await res.json().catch(() => ({}))).error || "Error al subir");
+      for (const file of list) {
+        setProgress(`Subiendo ${done + 1} de ${list.length}…`);
+        try {
+          await uploadImage(file, sectionId);
+          done++;
+        } catch (e) {
+          errors.push(`${file.name}: ${e instanceof Error ? e.message : "error"}`);
+        }
       }
-      setProgress(`Listo: ${list.length} foto(s) subida(s).`);
+      setProgress(
+        errors.length === 0
+          ? `Listo: ${done} foto(s) subida(s).`
+          : `${done} subida(s), ${errors.length} con error. ${errors[0]}`,
+      );
       router.refresh();
-    } catch (e) {
-      setProgress(e instanceof Error ? e.message : "Error al subir");
     } finally {
       setBusy(false);
       if (input.current) input.current.value = "";

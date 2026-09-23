@@ -4,6 +4,9 @@ import { SESSION_COOKIE, isValidSession } from "@/lib/auth";
 import { storeImage } from "@/lib/media";
 import { prisma } from "@/lib/prisma";
 
+// En Vercel: tiempo máximo de la función (procesar con sharp y subir a Blob)
+export const maxDuration = 60;
+
 /**
  * POST /api/upload  (multipart/form-data)
  *  - files[]:   una o varias imágenes

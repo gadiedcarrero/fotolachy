@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { SESSION_COOKIE, SESSION_MAX_AGE, checkPassword, sessionToken } from "@/lib/auth";
-import { deleteStoredImage, storeImage } from "@/lib/media";
+import { deleteStoredImage } from "@/lib/media";
 import { slugify } from "@/lib/data";
 
 export type ActionState = { ok: boolean; message: string } | null;
@@ -58,28 +58,31 @@ export async function updateSettings(_prev: ActionState, formData: FormData): Pr
   return { ok: true, message: "Ajustes guardados." };
 }
 
-/** Sube una imagen para el hero o para "sobre nosotros". field = heroPhotoUrl | aboutPhotoUrl */
-export async function uploadSettingsImage(formData: FormData): Promise<void> {
-  const field = String(formData.get("field"));
-  if (field !== "heroPhotoUrl" && field !== "aboutPhotoUrl") return;
-  const file = formData.get("file");
-  if (!(file instanceof File) || file.size === 0) return;
+export type ImageField = "heroPhotoUrl" | "aboutPhotoUrl";
 
+function isImageField(f: string): f is ImageField {
+  return f === "heroPhotoUrl" || f === "aboutPhotoUrl";
+}
+
+/**
+ * Asigna una foto fija (hero o "sobre nosotros") a partir de una URL ya subida por /api/upload.
+ * La subida se hace desde el navegador para respetar el límite de tamaño por petición.
+ */
+export async function setSettingsImage(field: string, url: string): Promise<void> {
+  if (!isImageField(field) || !url) return;
   const current = await prisma.siteSettings.findUnique({ where: { id: 1 } });
-  const stored = await storeImage(Buffer.from(await file.arrayBuffer()));
   await prisma.siteSettings.upsert({
     where: { id: 1 },
-    update: { [field]: stored.url },
-    create: { id: 1, [field]: stored.url },
+    update: { [field]: url },
+    create: { id: 1, [field]: url },
   });
-  await deleteStoredImage(current?.[field]);
+  if (current?.[field] && current[field] !== url) await deleteStoredImage(current[field]);
   revalidateSite();
   revalidatePath("/admin/ajustes");
 }
 
-export async function clearSettingsImage(formData: FormData): Promise<void> {
-  const field = String(formData.get("field"));
-  if (field !== "heroPhotoUrl" && field !== "aboutPhotoUrl") return;
+export async function clearSettingsImage(field: string): Promise<void> {
+  if (!isImageField(field)) return;
   const current = await prisma.siteSettings.findUnique({ where: { id: 1 } });
   await prisma.siteSettings.update({ where: { id: 1 }, data: { [field]: null } });
   await deleteStoredImage(current?.[field]);
