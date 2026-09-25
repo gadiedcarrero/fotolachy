@@ -4,11 +4,20 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
-import { SESSION_COOKIE, SESSION_MAX_AGE, checkPassword, sessionToken } from "@/lib/auth";
+import { SESSION_COOKIE, SESSION_MAX_AGE, checkPassword, isValidSession, sessionToken } from "@/lib/auth";
 import { deleteStoredImage } from "@/lib/media";
 import { slugify } from "@/lib/data";
 
 export type ActionState = { ok: boolean; message: string } | null;
+
+/**
+ * Las server actions son endpoints públicos: cualquiera puede llamarlas sin pasar por /admin.
+ * El proxy solo protege las páginas, así que cada acción del panel comprueba la sesión.
+ */
+async function requireAdmin() {
+  const ok = await isValidSession((await cookies()).get(SESSION_COOKIE)?.value);
+  if (!ok) redirect("/admin/login");
+}
 
 function revalidateSite() {
   revalidatePath("/", "layout");
@@ -45,6 +54,7 @@ const TEXT_FIELDS = [
 ] as const;
 
 export async function updateSettings(_prev: ActionState, formData: FormData): Promise<ActionState> {
+  await requireAdmin();
   const data: Record<string, string | number | boolean> = {};
   for (const f of TEXT_FIELDS) {
     const v = formData.get(f);
@@ -70,6 +80,7 @@ function isImageField(f: string): f is ImageField {
  * La subida se hace desde el navegador para respetar el límite de tamaño por petición.
  */
 export async function setSettingsImage(field: string, url: string): Promise<void> {
+  await requireAdmin();
   if (!isImageField(field) || !url) return;
   const current = await prisma.siteSettings.findUnique({ where: { id: 1 } });
   await prisma.siteSettings.upsert({
@@ -83,6 +94,7 @@ export async function setSettingsImage(field: string, url: string): Promise<void
 }
 
 export async function clearSettingsImage(field: string): Promise<void> {
+  await requireAdmin();
   if (!isImageField(field)) return;
   const current = await prisma.siteSettings.findUnique({ where: { id: 1 } });
   await prisma.siteSettings.update({ where: { id: 1 }, data: { [field]: null } });
@@ -94,6 +106,7 @@ export async function clearSettingsImage(field: string): Promise<void> {
 /* ---------- Secciones ---------- */
 
 export async function createSection(formData: FormData): Promise<void> {
+  await requireAdmin();
   const title = String(formData.get("title") ?? "").trim();
   if (!title) return;
   let slug = slugify(String(formData.get("slug") || title));
@@ -124,6 +137,7 @@ function normalizeLayout(value: FormDataEntryValue | null): string {
 }
 
 export async function updateSection(_prev: ActionState, formData: FormData): Promise<ActionState> {
+  await requireAdmin();
   const id = String(formData.get("id"));
   const title = String(formData.get("title") ?? "").trim();
   if (!id || !title) return { ok: false, message: "El título es obligatorio." };
@@ -149,6 +163,7 @@ export async function updateSection(_prev: ActionState, formData: FormData): Pro
 }
 
 export async function deleteSection(formData: FormData): Promise<void> {
+  await requireAdmin();
   const id = String(formData.get("id"));
   const section = await prisma.section.findUnique({
     where: { id },
@@ -168,6 +183,7 @@ export async function deleteSection(formData: FormData): Promise<void> {
 
 /** Sube o baja una sección entre sus hermanas (mismo padre). */
 export async function moveSection(formData: FormData): Promise<void> {
+  await requireAdmin();
   const id = String(formData.get("id"));
   const dir = formData.get("dir") === "up" ? -1 : 1;
   const me = await prisma.section.findUnique({ where: { id }, select: { parentId: true } });
@@ -185,6 +201,7 @@ export async function moveSection(formData: FormData): Promise<void> {
 
 /** Define la foto de portada (la que aparece en el menú) a partir de una foto de la sección. */
 export async function setSectionCover(formData: FormData): Promise<void> {
+  await requireAdmin();
   const id = String(formData.get("id"));
   const url = String(formData.get("url"));
   await prisma.section.update({ where: { id }, data: { coverUrl: url || null } });
@@ -195,6 +212,7 @@ export async function setSectionCover(formData: FormData): Promise<void> {
 /* ---------- Fotos ---------- */
 
 export async function deletePhoto(formData: FormData): Promise<void> {
+  await requireAdmin();
   const id = String(formData.get("id"));
   const photo = await prisma.photo.findUnique({ where: { id } });
   if (!photo) return;
@@ -209,6 +227,7 @@ export async function deletePhoto(formData: FormData): Promise<void> {
 }
 
 export async function updatePhotoAlt(formData: FormData): Promise<void> {
+  await requireAdmin();
   const id = String(formData.get("id"));
   const alt = String(formData.get("alt") ?? "").trim();
   const photo = await prisma.photo.update({ where: { id }, data: { alt } });
@@ -218,6 +237,7 @@ export async function updatePhotoAlt(formData: FormData): Promise<void> {
 
 /** Reordena las fotos de una sección. orderedIds = ids en el nuevo orden. */
 export async function reorderPhotos(sectionId: string, orderedIds: string[]): Promise<void> {
+  await requireAdmin();
   await prisma.$transaction(
     orderedIds.map((id, i) => prisma.photo.update({ where: { id, sectionId }, data: { order: i } })),
   );
@@ -228,6 +248,7 @@ export async function reorderPhotos(sectionId: string, orderedIds: string[]): Pr
 /* ---------- Mensajes ---------- */
 
 export async function toggleInquiryRead(formData: FormData): Promise<void> {
+  await requireAdmin();
   const id = String(formData.get("id"));
   const inquiry = await prisma.inquiry.findUnique({ where: { id } });
   if (!inquiry) return;
@@ -236,6 +257,7 @@ export async function toggleInquiryRead(formData: FormData): Promise<void> {
 }
 
 export async function deleteInquiry(formData: FormData): Promise<void> {
+  await requireAdmin();
   const id = String(formData.get("id"));
   await prisma.inquiry.delete({ where: { id } }).catch(() => {});
   revalidatePath("/admin/mensajes");
