@@ -10,10 +10,11 @@ type Props = {
   cta: string;
   delayMs: number;
   href?: string;
+  closeLabel: string;
 };
 
 /** Tarjeta de "Reservas" que aparece en la esquina inferior derecha tras unos segundos. */
-export default function BookingPopup({ enabled, title, text, cta, delayMs, href = "#contacto" }: Props) {
+export default function BookingPopup({ enabled, title, text, cta, delayMs, href = "#contacto", closeLabel }: Props) {
   const [visible, setVisible] = useState(false);
   const [dismissed, setDismissed] = useState(false);
   const box = useRef<HTMLDivElement>(null);
@@ -60,7 +61,7 @@ export default function BookingPopup({ enabled, title, text, cta, delayMs, href 
       <button
         type="button"
         onClick={close}
-        aria-label="Cerrar"
+        aria-label={closeLabel}
         className="absolute right-3 top-2 text-xl leading-none text-ink/70 hover:text-ink"
       >
         ×

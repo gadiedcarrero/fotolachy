@@ -93,15 +93,17 @@ export default function MenuOverlay({ open, items, onClose }: Props) {
     <div
       ref={root}
       id="site-menu"
-      className="fixed inset-0 z-40 bg-bg hidden flex-col items-center justify-center text-center px-6 overflow-y-auto"
+      className="fixed inset-0 z-40 bg-bg hidden flex-col items-center text-center px-6 pt-24 pb-10 md:pt-28 overflow-y-auto"
       style={{ display: "none" }}
       aria-hidden={!open}
     >
-      <nav className="flex flex-col items-center gap-1 pt-20 md:pt-0">{primary.map(renderLink)}</nav>
+      {/* my-auto centra sin recortar: si no cabe, el contenido empieza bajo la barra y se hace scroll */}
+      <div className="my-auto flex flex-col items-center">
+      <nav className="flex flex-col items-center gap-1">{primary.map(renderLink)}</nav>
 
       <div
         data-menu-image
-        className="relative my-4 w-[38vw] max-w-[380px] aspect-[3/4] photo-frame mono shrink-0"
+        className="relative my-4 h-[min(48vh,480px)] aspect-[3/4] photo-frame shrink-0"
       >
         {active && (
           <Image
@@ -115,7 +117,8 @@ export default function MenuOverlay({ open, items, onClose }: Props) {
         )}
       </div>
 
-      <nav className="flex flex-col items-center gap-1 pb-10 md:pb-0">{secondary.map(renderLink)}</nav>
+      <nav className="flex flex-col items-center gap-1">{secondary.map(renderLink)}</nav>
+      </div>
     </div>
   );
 }

@@ -1,6 +1,7 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
+import { getDict, normalizeLang } from "@/lib/i18n";
 
 export type ContactState = { ok: boolean; message: string } | null;
 
@@ -9,12 +10,13 @@ export async function sendInquiry(_prev: ContactState, formData: FormData): Prom
   const get = (k: string) => String(formData.get(k) ?? "").trim();
   const name = get("name");
   const email = get("email");
+  const t = getDict(normalizeLang(get("lang"))).form;
 
   // Honeypot anti-spam
-  if (get("website")) return { ok: true, message: "Gracias, te escribiremos pronto." };
+  if (get("website")) return { ok: true, message: t.ok };
 
   if (!name || !email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
-    return { ok: false, message: "Por favor indica tu nombre y un email válido." };
+    return { ok: false, message: t.invalid };
   }
 
   await prisma.inquiry.create({
@@ -30,5 +32,5 @@ export async function sendInquiry(_prev: ContactState, formData: FormData): Prom
     },
   });
 
-  return { ok: true, message: "Gracias. Hemos recibido tu mensaje y te responderemos muy pronto." };
+  return { ok: true, message: t.ok };
 }

@@ -11,24 +11,21 @@ import Footer from "@/components/site/Footer";
 import WhatsAppButton, { whatsappLink } from "@/components/site/WhatsAppButton";
 import Reveal from "@/components/site/Reveal";
 import { getSections, getSettings, sectionCover } from "@/lib/data";
-import type { MenuItem } from "@/components/site/MenuOverlay";
+import { getDict } from "@/lib/i18n";
+import { getLang } from "@/lib/lang";
+import { buildMenu } from "@/lib/menu";
+import { localizeContent } from "@/lib/translate";
 
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
-  const [settings, sections] = await Promise.all([getSettings(), getSections()]);
+  const lang = await getLang();
+  const t = getDict(lang);
+  const [rawSettings, rawSections] = await Promise.all([getSettings(), getSections()]);
+  const { settings, sections } = await localizeContent(lang, rawSettings, rawSections);
 
   const menuSections = sections.filter((s) => s.showInMenu);
-  const menuItems: MenuItem[] = [
-    ...menuSections.map((s, i) => ({
-      label: s.title,
-      href: `/galeria/${s.slug}`,
-      image: sectionCover(s),
-      group: (i < Math.ceil(menuSections.length / 2) ? "primary" : "secondary") as MenuItem["group"],
-    })),
-    { label: "Nosotros", href: "/#nosotros", image: settings.aboutPhotoUrl, group: "secondary" },
-    { label: "Contacto", href: "/#contacto", image: settings.heroPhotoUrl, group: "secondary" },
-  ];
+  const menuItems = buildMenu(sections, settings, t);
 
   const homeSections = sections.filter((s) => s.showInHome);
   const cardSections = homeSections
@@ -44,7 +41,7 @@ export default async function HomePage() {
 
   return (
     <>
-      <Header siteName={settings.siteName} items={menuItems} />
+      <Header siteName={settings.siteName} items={menuItems} lang={lang} t={t} />
       <main>
         <Hero
           photoUrl={settings.heroPhotoUrl}
@@ -84,6 +81,7 @@ export default async function HomePage() {
                 description={s.description}
                 href={`/galeria/${s.slug}`}
                 stories={stories}
+                t={t}
               />
             );
           }
@@ -93,16 +91,16 @@ export default async function HomePage() {
                 <Reveal>
                   <div className="flex flex-wrap items-end justify-between gap-6">
                     <div>
-                      <p className="eyebrow text-muted">{s.subtitle || "Galería"}</p>
+                      <p className="eyebrow text-muted">{s.subtitle || t.gallery}</p>
                       <h2 className="display-serif mt-3 text-[clamp(2.6rem,6vw,5.5rem)]">{s.title}</h2>
                     </div>
                     <Link href={`/galeria/${s.slug}`} className="btn-outline">
-                      Ver galería completa
+                      {t.viewFullGallery}
                     </Link>
                   </div>
                 </Reveal>
                 <div className="mt-14">
-                  <GridGallery photos={s.photos.slice(0, 9)} />
+                  <GridGallery photos={s.photos.slice(0, 9)} emptyText={t.noPhotos} />
                 </div>
               </section>
             );
@@ -110,7 +108,7 @@ export default async function HomePage() {
           return null;
         })}
 
-        <SectionCards heading="Más galerías" cards={cardSections} />
+        <SectionCards heading={t.moreGalleries} cards={cardSections} t={t} />
 
         <About
           title={settings.aboutTitle}
@@ -121,13 +119,15 @@ export default async function HomePage() {
         />
 
         <ContactForm
-          title="Consulta tu fecha"
+          title={t.contactTitle}
           text={settings.contactText}
           email={settings.contactEmail}
           whatsappHref={whatsappLink(settings.whatsappNumber, settings.whatsappMessage)}
+          lang={lang}
+          t={t}
         />
       </main>
-      <WhatsAppButton number={settings.whatsappNumber} message={settings.whatsappMessage} />
+      <WhatsAppButton number={settings.whatsappNumber} message={settings.whatsappMessage} label={t.whatsapp} />
       <Footer
         siteName={settings.siteName}
         email={settings.contactEmail}
@@ -141,6 +141,7 @@ export default async function HomePage() {
         text={settings.bookingText}
         cta={settings.bookingCta}
         delayMs={settings.bookingDelayMs}
+        closeLabel={t.closeLabel}
       />
     </>
   );

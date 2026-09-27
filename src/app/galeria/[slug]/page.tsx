@@ -6,34 +6,37 @@ import SectionCards from "@/components/site/SectionCards";
 import Footer from "@/components/site/Footer";
 import WhatsAppButton from "@/components/site/WhatsAppButton";
 import Reveal from "@/components/site/Reveal";
-import { getSectionBySlug, getSections, getSettings, sectionCover } from "@/lib/data";
-import type { MenuItem } from "@/components/site/MenuOverlay";
+import { getSectionBySlug, getSections, getSettings, sectionCover, type SectionDetail, type SectionTree } from "@/lib/data";
+import { getDict } from "@/lib/i18n";
+import { getLang } from "@/lib/lang";
+import { buildMenu } from "@/lib/menu";
+import { localizeContent, translateMany } from "@/lib/translate";
 import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
 
 export async function generateMetadata({ params }: PageProps<"/galeria/[slug]">): Promise<Metadata> {
   const { slug } = await params;
+  const lang = await getLang();
   const section = await getSectionBySlug(slug);
-  return { title: section ? section.title : "Galería" };
+  if (!section) return { title: getDict(lang).gallery };
+  const map = await translateMany([section.title], lang);
+  return { title: map.get(section.title) ?? section.title };
 }
 
 export default async function GalleryPage({ params }: PageProps<"/galeria/[slug]">) {
   const { slug } = await params;
-  const [settings, sections, section] = await Promise.all([getSettings(), getSections(), getSectionBySlug(slug)]);
-  if (!section) notFound();
+  const lang = await getLang();
+  const t = getDict(lang);
+  const [rawSettings, rawSections, rawSection] = await Promise.all([getSettings(), getSections(), getSectionBySlug(slug)]);
+  if (!rawSection) notFound();
+  // Se traducen juntas para hacer una sola consulta de traducciones
+  const localized = await localizeContent(lang, rawSettings, [rawSection, ...rawSections]);
+  const { settings } = localized;
+  const [section, ...sections] = localized.sections as [SectionDetail, ...SectionTree[]];
 
   const menuSections = sections.filter((s) => s.showInMenu);
-  const menuItems: MenuItem[] = [
-    ...menuSections.map((s, i) => ({
-      label: s.title,
-      href: `/galeria/${s.slug}`,
-      image: sectionCover(s),
-      group: (i < Math.ceil(menuSections.length / 2) ? "primary" : "secondary") as MenuItem["group"],
-    })),
-    { label: "Nosotros", href: "/#nosotros", image: settings.aboutPhotoUrl, group: "secondary" },
-    { label: "Contacto", href: "/#contacto", image: settings.heroPhotoUrl, group: "secondary" },
-  ];
+  const menuItems = buildMenu(sections, settings, t);
 
   // Historias (sub-galerías) de esta sección, como tarjetas
   const stories = section.children
@@ -42,7 +45,7 @@ export default async function GalleryPage({ params }: PageProps<"/galeria/[slug]
 
   return (
     <>
-      <Header siteName={settings.siteName} items={menuItems} />
+      <Header siteName={settings.siteName} items={menuItems} lang={lang} t={t} />
       <main className="pt-32 md:pt-40 pb-24">
         <div className="px-6 md:px-16">
           <Reveal>
@@ -51,25 +54,25 @@ export default async function GalleryPage({ params }: PageProps<"/galeria/[slug]
                 ← {section.parent.title}
               </Link>
             )}
-            <p className={`eyebrow text-muted ${section.parent ? "mt-6" : ""}`}>{section.subtitle || "Galería"}</p>
+            <p className={`eyebrow text-muted ${section.parent ? "mt-6" : ""}`}>{section.subtitle || t.gallery}</p>
             <h1 className="display-serif mt-3 text-[clamp(3rem,8vw,7.5rem)]">{section.title}</h1>
             {section.description && <p className="mt-6 max-w-2xl leading-relaxed text-ink/80 whitespace-pre-line">{section.description}</p>}
           </Reveal>
         </div>
 
-        {stories.length > 0 && <SectionCards heading="Historias" cards={stories} />}
+        {stories.length > 0 && <SectionCards heading={t.stories} cards={stories} t={t} />}
 
         {section.photos.length > 0 && (
           <div className="px-6 md:px-16 mt-16">
-            <GridGallery photos={section.photos} />
+            <GridGallery photos={section.photos} emptyText={t.noPhotos} />
           </div>
         )}
 
         {stories.length === 0 && section.photos.length === 0 && (
-          <p className="px-6 md:px-16 mt-16 text-muted">Aún no hay fotos en esta galería.</p>
+          <p className="px-6 md:px-16 mt-16 text-muted">{t.noPhotos}</p>
         )}
       </main>
-      <WhatsAppButton number={settings.whatsappNumber} message={settings.whatsappMessage} />
+      <WhatsAppButton number={settings.whatsappNumber} message={settings.whatsappMessage} label={t.whatsapp} />
       <Footer
         siteName={settings.siteName}
         email={settings.contactEmail}

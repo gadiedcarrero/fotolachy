@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef } from "react";
 import { gsap, ScrollTrigger } from "@/lib/gsap";
+import type { Dict } from "@/lib/i18n";
 
 export type Story = {
   id: string;
@@ -20,13 +21,14 @@ type Props = {
   description?: string | null;
   href: string;
   stories: Story[];
+  t: Dict;
 };
 
 /**
  * Sección "pinned": mientras el usuario hace scroll vertical, la fila de historias
  * se desplaza horizontalmente. Cada historia es una tarjeta que lleva a su propia galería.
  */
-export default function HorizontalStories({ title, subtitle, description, href, stories }: Props) {
+export default function HorizontalStories({ title, subtitle, description, href, stories, t }: Props) {
   const root = useRef<HTMLElement>(null);
   const track = useRef<HTMLDivElement>(null);
 
@@ -68,11 +70,11 @@ export default function HorizontalStories({ title, subtitle, description, href, 
         <div ref={track} className="flex flex-col md:flex-row md:items-center gap-8 md:gap-10 will-change-transform px-6 md:pl-16 md:pr-16 py-16 md:py-0">
           {/* Encabezado: viaja con el track */}
           <div className="md:w-[30vw] md:min-w-[30vw] md:pr-12">
-            <p className="eyebrow text-muted">{subtitle || "Historias"}</p>
+            <p className="eyebrow text-muted">{subtitle || t.stories}</p>
             <h2 className="display-serif mt-3 text-[clamp(2.6rem,6vw,5.5rem)]">{title}</h2>
             {description && <p className="mt-5 max-w-sm text-ink/75 leading-relaxed">{description}</p>}
             <Link href={href} className="btn-outline mt-8">
-              Ver todas
+              {t.viewAll}
             </Link>
           </div>
 
@@ -82,7 +84,7 @@ export default function HorizontalStories({ title, subtitle, description, href, 
               href={`/galeria/${s.slug}`}
               className={`group shrink-0 w-full md:w-[28vw] ${i % 2 === 1 ? "md:mt-28" : "md:-mt-10"}`}
             >
-              <figure className="photo-frame mono aspect-[3/4]">
+              <figure className="photo-frame aspect-[3/4]">
                 {s.cover && (
                   <Image
                     src={s.cover}
@@ -99,7 +101,7 @@ export default function HorizontalStories({ title, subtitle, description, href, 
                   <span className="display-serif block text-[1.9rem] leading-none group-hover:opacity-60 transition-opacity">{s.title}</span>
                   {s.subtitle && <span className="eyebrow mt-2 block text-muted normal-case tracking-[0.12em]">{s.subtitle}</span>}
                 </span>
-                <span className="eyebrow text-muted whitespace-nowrap">{s.count} fotos</span>
+                <span className="eyebrow text-muted whitespace-nowrap">{s.count} {t.photos}</span>
               </figcaption>
             </Link>
           ))}

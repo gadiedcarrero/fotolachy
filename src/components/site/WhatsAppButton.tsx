@@ -6,7 +6,7 @@ export function whatsappLink(number: string, message: string): string | null {
   return `https://wa.me/${digits}${text ? `?text=${encodeURIComponent(text)}` : ""}`;
 }
 
-export default function WhatsAppButton({ number, message }: { number: string; message: string }) {
+export default function WhatsAppButton({ number, message, label }: { number: string; message: string; label: string }) {
   const href = whatsappLink(number, message);
   if (!href) return null;
   return (
@@ -14,8 +14,8 @@ export default function WhatsAppButton({ number, message }: { number: string; me
       href={href}
       target="_blank"
       rel="noreferrer"
-      aria-label="Escríbenos por WhatsApp"
-      title="Escríbenos por WhatsApp"
+      aria-label={label}
+      title={label}
       className="fixed bottom-4 right-4 z-30 flex h-14 w-14 items-center justify-center rounded-full bg-[#25D366] text-white shadow-[0_10px_30px_rgba(0,0,0,0.2)] transition-transform hover:scale-105"
     >
       <svg viewBox="0 0 32 32" width="30" height="30" fill="currentColor" aria-hidden="true">

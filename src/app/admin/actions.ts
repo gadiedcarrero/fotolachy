@@ -3,10 +3,12 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
+import { after } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { SESSION_COOKIE, SESSION_MAX_AGE, checkPassword, isValidSession, sessionToken } from "@/lib/auth";
 import { deleteStoredImage } from "@/lib/media";
 import { slugify } from "@/lib/data";
+import { warmTranslations } from "@/lib/translate";
 
 export type ActionState = { ok: boolean; message: string } | null;
 
@@ -21,6 +23,8 @@ async function requireAdmin() {
 
 function revalidateSite() {
   revalidatePath("/", "layout");
+  // Traduce al inglés los textos nuevos o cambiados sin hacer esperar al panel
+  after(() => warmTranslations().catch((err) => console.error("[translate]", err)));
 }
 
 /* ---------- Sesión ---------- */

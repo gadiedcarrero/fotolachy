@@ -11,11 +11,11 @@ type Props = {
 
 export default function Footer({ siteName, email, instagramUrl, footerText, links }: Props) {
   return (
-    <footer className="border-t border-line px-6 md:px-16 py-12">
+    <footer className="bg-ink text-bg px-6 md:px-16 py-12">
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
         <div>
           <Link href="/" aria-label={siteName} className="inline-block">
-            <Image src="/logo.png" alt={siteName} width={1200} height={295} className="h-12 w-auto" />
+            <Image src="/lachy.png" alt={siteName} width={1536} height={1024} className="h-20 w-auto" />
           </Link>
           <a href={`mailto:${email}`} className="mt-4 block font-serif italic text-xl hover:opacity-60 transition-opacity">
             {email}
@@ -32,7 +32,7 @@ export default function Footer({ siteName, email, instagramUrl, footerText, link
           </a>
         </nav>
       </div>
-      <p className="mt-10 text-xs text-muted">
+      <p className="mt-10 text-xs text-bg/60">
         {footerText} · {new Date().getFullYear()}
       </p>
     </footer>

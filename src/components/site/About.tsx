@@ -14,7 +14,7 @@ export default function About({ title, text, photoUrl, quote, pressText }: Props
     <section id="nosotros" className="px-6 md:px-16 py-24 md:py-32 border-t border-line">
       <div className="grid grid-cols-1 md:grid-cols-12 gap-10 md:gap-16 items-center">
         <Reveal className="md:col-span-5">
-          <div className="photo-frame mono aspect-[3/4]">
+          <div className="photo-frame aspect-[3/4]">
             {photoUrl && (
               <Image src={photoUrl} alt={title} width={900} height={1200} sizes="(max-width: 768px) 100vw, 40vw" className="h-full w-full object-cover" />
             )}

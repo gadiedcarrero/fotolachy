@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Cormorant_Garamond, Jost } from "next/font/google";
 import "./globals.css";
 import { getSettings } from "@/lib/data";
+import { getLang } from "@/lib/lang";
+import { translateMany } from "@/lib/translate";
 
 const cormorant = Cormorant_Garamond({
   variable: "--font-cormorant",
@@ -21,9 +23,9 @@ export async function generateMetadata(): Promise<Metadata> {
   let siteName = "Foto Lachy";
   let description = "Fotografía editorial de bodas";
   try {
-    const s = await getSettings();
+    const [s, lang] = await Promise.all([getSettings(), getLang()]);
     siteName = s.siteName;
-    description = s.tagline;
+    description = (await translateMany([s.tagline], lang)).get(s.tagline) ?? s.tagline;
   } catch {
     // Sin base de datos (por ejemplo al prerenderizar la 404 en el build) se usan los valores por defecto
   }
@@ -33,11 +35,12 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default async function RootLayout({ children }: LayoutProps<"/">) {
+  const lang = await getLang();
   // suppressHydrationWarning: extensiones del navegador (LanguageTool, etc.) añaden atributos
   // a <html> antes de que React hidrate y provocan un falso aviso de hydration mismatch.
   return (
-    <html lang="es" className={`${cormorant.variable} ${jost.variable} h-full antialiased`} suppressHydrationWarning>
+    <html lang={lang} className={`${cormorant.variable} ${jost.variable} h-full antialiased`} suppressHydrationWarning>
       <body className="min-h-full flex flex-col">{children}</body>
     </html>
   );

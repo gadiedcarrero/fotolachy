@@ -75,6 +75,16 @@ model Photo {
   createdAt DateTime @default(now())
 }
 
+/// Traducciones automáticas del contenido (se escribe en español en el panel).
+/// Se guardan para traducir cada texto una sola vez; id = hash del idioma + texto original.
+model Translation {
+  id        String   @id
+  lang      String
+  source    String
+  text      String
+  createdAt DateTime @default(now())
+}
+
 /// Mensajes del formulario de contacto
 model Inquiry {
   id        String   @id @default(cuid())

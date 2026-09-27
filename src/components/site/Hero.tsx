@@ -37,7 +37,7 @@ export default function Hero({ photoUrl, line1, line2, line3, subtitle }: Props)
   return (
     <section ref={root} className="relative min-h-[100svh] overflow-hidden">
       {/* Foto principal: ocupa el lado izquierdo en desktop, todo el fondo en móvil */}
-      <div className="absolute inset-0 md:right-[38%] mono" data-hero-photo>
+      <div className="absolute inset-0 md:right-[38%]" data-hero-photo>
         {photoUrl ? (
           <Image src={photoUrl} alt="" fill priority sizes="100vw" className="object-cover object-top" />
         ) : (

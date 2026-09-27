@@ -6,18 +6,19 @@ export type GalleryPhoto = { id: string; url: string; alt: string; width: number
 type Props = {
   photos: GalleryPhoto[];
   columns?: 2 | 3;
+  emptyText: string;
 };
 
 /** Cuadrícula tipo masonry (usa CSS columns) para galerías en vertical. */
-export default function GridGallery({ photos, columns = 3 }: Props) {
+export default function GridGallery({ photos, columns = 3, emptyText }: Props) {
   if (photos.length === 0) {
-    return <p className="text-center text-muted py-20">Aún no hay fotos en esta galería.</p>;
+    return <p className="text-center text-muted py-20">{emptyText}</p>;
   }
   return (
     <div className={`${columns === 2 ? "md:columns-2" : "md:columns-3"} columns-1 gap-4 md:gap-6 *:mb-4 md:*:mb-6`}>
       {photos.map((p) => (
         <Reveal key={p.id}>
-          <figure className="photo-frame mono break-inside-avoid" style={{ aspectRatio: `${p.width} / ${p.height}` }}>
+          <figure className="photo-frame break-inside-avoid" style={{ aspectRatio: `${p.width} / ${p.height}` }}>
             <Image
               src={p.url}
               alt={p.alt}
