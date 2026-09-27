@@ -6,10 +6,11 @@ import SectionCards from "@/components/site/SectionCards";
 import Footer from "@/components/site/Footer";
 import WhatsAppButton from "@/components/site/WhatsAppButton";
 import Reveal from "@/components/site/Reveal";
+import VideoGallery from "@/components/site/VideoGallery";
 import { getSectionBySlug, getSections, getSettings, sectionCover, type SectionDetail, type SectionTree } from "@/lib/data";
 import { getDict } from "@/lib/i18n";
 import { getLang } from "@/lib/lang";
-import { buildMenu, socialLinks } from "@/lib/menu";
+import { buildMenu, socialLinks, visibleInMenu } from "@/lib/menu";
 import { localizeContent, translateMany } from "@/lib/translate";
 import type { Metadata } from "next";
 
@@ -35,7 +36,7 @@ export default async function GalleryPage({ params }: PageProps<"/galeria/[slug]
   const { settings } = localized;
   const [section, ...sections] = localized.sections as [SectionDetail, ...SectionTree[]];
 
-  const menuSections = sections.filter((s) => s.showInMenu);
+  const menuSections = visibleInMenu(sections);
   const menuItems = buildMenu(sections, settings, t);
 
   // Historias (sub-galerías) de esta sección, como tarjetas
@@ -68,7 +69,14 @@ export default async function GalleryPage({ params }: PageProps<"/galeria/[slug]
           </div>
         )}
 
-        {stories.length === 0 && section.photos.length === 0 && (
+        {section.videos.length > 0 && (
+          <div className="px-6 md:px-16 mt-20">
+            <p className="eyebrow text-muted mb-8">{t.videos}</p>
+            <VideoGallery videos={section.videos} playLabel={t.playVideo} />
+          </div>
+        )}
+
+        {stories.length === 0 && section.photos.length === 0 && section.videos.length === 0 && (
           <p className="px-6 md:px-16 mt-16 text-muted">{t.noPhotos}</p>
         )}
       </main>

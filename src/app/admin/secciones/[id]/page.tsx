@@ -5,6 +5,7 @@ import { getSectionById, sectionCover } from "@/lib/data";
 import SectionForm from "./SectionForm";
 import Uploader from "@/components/admin/Uploader";
 import PhotoManager from "@/components/admin/PhotoManager";
+import VideoManager from "@/components/admin/VideoManager";
 import { createSection, deleteSection, moveSection } from "../../actions";
 
 export const dynamic = "force-dynamic";
@@ -105,6 +106,14 @@ export default async function SectionEditPage({ params }: PageProps<"/admin/secc
       </div>
       <div className="mt-6">
         <PhotoManager sectionId={section.id} photos={section.photos} coverUrl={section.coverUrl} />
+      </div>
+
+      <h2 className="mt-10 text-lg font-medium">Videos</h2>
+      <p className="mt-1 text-sm text-muted">
+        Sube el video a YouTube y pega aquí su enlace (en YouTube: botón «Compartir» → «Copiar»). Se verá en esta galería, debajo de las fotos.
+      </p>
+      <div className="mt-3">
+        <VideoManager sectionId={section.id} videos={section.videos} />
       </div>
 
       <div className="mt-14 rounded-lg border border-red-200 bg-white p-5">

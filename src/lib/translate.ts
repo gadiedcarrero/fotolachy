@@ -1,7 +1,7 @@
 import { createHash } from "node:crypto";
 import Anthropic from "@anthropic-ai/sdk";
 import { prisma } from "@/lib/prisma";
-import type { Photo, Section, SiteSettings } from "@prisma/client";
+import type { Photo, Section, SiteSettings, Video } from "@prisma/client";
 import type { Lang } from "./i18n";
 
 /**
@@ -102,13 +102,14 @@ const SETTINGS_FIELDS = [
 
 const SECTION_FIELDS = ["title", "subtitle", "description"] as const satisfies readonly (keyof Section)[];
 
-type WithPhotos = { photos?: Photo[] };
+type WithPhotos = { photos?: Photo[]; videos?: Video[] };
 type Localizable = Section & WithPhotos & { children?: (Section & WithPhotos)[]; parent?: Section | null };
 
 function sectionTexts(s: Localizable): (string | null)[] {
   return [
     ...SECTION_FIELDS.map((f) => s[f]),
     ...(s.photos ?? []).map((p) => p.alt),
+    ...(s.videos ?? []).map((v) => v.title),
     ...(s.children ?? []).flatMap(sectionTexts),
     ...(s.parent ? sectionTexts(s.parent) : []),
   ];
@@ -122,6 +123,7 @@ function applySection<T extends Localizable>(s: T, map: Map<string, string>): T 
     subtitle: tr(s.subtitle),
     description: tr(s.description),
     photos: s.photos?.map((p) => ({ ...p, alt: tr(p.alt) })),
+    videos: s.videos?.map((v) => ({ ...v, title: tr(v.title) })),
     children: s.children?.map((c) => applySection(c, map)),
     parent: s.parent ? applySection(s.parent, map) : s.parent,
   };
@@ -147,7 +149,7 @@ export async function localizeContent<S extends Localizable>(
 export async function warmTranslations(): Promise<void> {
   const [settings, sections] = await Promise.all([
     prisma.siteSettings.findUnique({ where: { id: 1 } }),
-    prisma.section.findMany({ include: { photos: true } }),
+    prisma.section.findMany({ include: { photos: true, videos: true } }),
   ]);
   if (!settings) return;
   await localizeContent("en", settings, sections);

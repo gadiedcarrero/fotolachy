@@ -26,7 +26,7 @@ export async function sendInquiry(_prev: ContactState, formData: FormData): Prom
       eventType: get("eventType") || null,
       location: get("location") || null,
       date: get("date") || null,
-      planner: get("planner") || null,
+      phone: get("phone") || null,
       instagram: get("instagram") || null,
       message: get("message") || null,
     },

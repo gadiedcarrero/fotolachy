@@ -29,6 +29,7 @@ export default async function InquiriesPage() {
               {q.eventType && (<><dt className="text-muted">Evento</dt><dd>{q.eventType}</dd></>)}
               {q.location && (<><dt className="text-muted">Lugar</dt><dd>{q.location}</dd></>)}
               {q.date && (<><dt className="text-muted">Fecha</dt><dd>{q.date}</dd></>)}
+              {q.phone && (<><dt className="text-muted">Teléfono</dt><dd><a href={`tel:${q.phone}`} className="hover:underline">{q.phone}</a></dd></>)}
               {q.planner && (<><dt className="text-muted">Planner</dt><dd>{q.planner}</dd></>)}
               {q.instagram && (<><dt className="text-muted">Instagram</dt><dd>{q.instagram}</dd></>)}
             </dl>

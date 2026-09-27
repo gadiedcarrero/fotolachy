@@ -7,6 +7,8 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "fastly.picsum.photos" },
       // Fotos subidas a Vercel Blob
       { protocol: "https", hostname: "*.public.blob.vercel-storage.com" },
+      // Miniaturas de los videos de YouTube
+      { protocol: "https", hostname: "i.ytimg.com" },
     ],
   },
   experimental: {

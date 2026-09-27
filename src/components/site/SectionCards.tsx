@@ -10,6 +10,7 @@ export type SectionCard = {
   subtitle?: string | null;
   cover: string | null;
   count: number;
+  videos?: number;
 };
 
 /** Bloque de "bodas destacadas": tarjetas que llevan a cada galería. */
@@ -32,7 +33,11 @@ export default function SectionCards({ heading, cards, t }: { heading: string; c
               </div>
               <div className="mt-4 flex items-baseline justify-between">
                 <h3 className="display-serif text-[1.9rem] group-hover:opacity-60 transition-opacity">{c.title}</h3>
-                <span className="eyebrow text-muted">{c.count} {t.photos}</span>
+                <span className="eyebrow text-muted whitespace-nowrap">
+                  {c.count > 0 && `${c.count} ${t.photos}`}
+                  {c.count > 0 && !!c.videos && " · "}
+                  {!!c.videos && `${c.videos} ${t.videos.toLowerCase()}`}
+                </span>
               </div>
               {c.subtitle && <p className="mt-1 text-sm text-muted">{c.subtitle}</p>}
             </Link>

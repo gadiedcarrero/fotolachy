@@ -10,10 +10,10 @@ import ContactForm from "@/components/site/ContactForm";
 import Footer from "@/components/site/Footer";
 import WhatsAppButton, { whatsappLink } from "@/components/site/WhatsAppButton";
 import Reveal from "@/components/site/Reveal";
-import { getSections, getSettings, sectionCover } from "@/lib/data";
+import { getSections, getSettings, hasContent, sectionCover } from "@/lib/data";
 import { getDict } from "@/lib/i18n";
 import { getLang } from "@/lib/lang";
-import { buildMenu, socialLinks } from "@/lib/menu";
+import { buildMenu, socialLinks, visibleInMenu } from "@/lib/menu";
 import { localizeContent } from "@/lib/translate";
 
 export const dynamic = "force-dynamic";
@@ -24,12 +24,12 @@ export default async function HomePage() {
   const [rawSettings, rawSections] = await Promise.all([getSettings(), getSections()]);
   const { settings, sections } = await localizeContent(lang, rawSettings, rawSections);
 
-  const menuSections = sections.filter((s) => s.showInMenu);
+  const menuSections = visibleInMenu(sections);
   const menuItems = buildMenu(sections, settings, t);
 
   const homeSections = sections.filter((s) => s.showInHome);
   const cardSections = homeSections
-    .filter((s) => s.layout === "card" && (s.photos.length > 0 || s.children.length > 0))
+    .filter((s) => s.layout === "card" && hasContent(s))
     .map((s) => ({
       id: s.id,
       slug: s.slug,
@@ -37,6 +37,7 @@ export default async function HomePage() {
       subtitle: s.subtitle,
       cover: sectionCover(s),
       count: s.photos.length + s.children.reduce((n, c) => n + c.photos.length, 0),
+      videos: s.videos.length,
     }));
 
   return (

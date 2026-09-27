@@ -7,7 +7,7 @@ import { after } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { SESSION_COOKIE, SESSION_MAX_AGE, checkPassword, isValidSession, sessionToken } from "@/lib/auth";
 import { deleteStoredImage } from "@/lib/media";
-import { slugify } from "@/lib/data";
+import { slugify, youtubeId } from "@/lib/data";
 import { warmTranslations } from "@/lib/translate";
 
 export type ActionState = { ok: boolean; message: string } | null;
@@ -247,6 +247,47 @@ export async function reorderPhotos(sectionId: string, orderedIds: string[]): Pr
   );
   revalidateSite();
   revalidatePath(`/admin/secciones/${sectionId}`);
+}
+
+/* ---------- Videos (YouTube) ---------- */
+
+export async function addVideo(_prev: ActionState, formData: FormData): Promise<ActionState> {
+  await requireAdmin();
+  const sectionId = String(formData.get("sectionId"));
+  const id = youtubeId(String(formData.get("url") ?? ""));
+  if (!id) return { ok: false, message: "No reconozco ese enlace. Copia la dirección del video desde YouTube (botón Compartir)." };
+  const last = await prisma.video.findFirst({ where: { sectionId }, orderBy: { order: "desc" } });
+  await prisma.video.create({
+    data: { sectionId, youtubeId: id, title: String(formData.get("title") ?? "").trim(), order: (last?.order ?? -1) + 1 },
+  });
+  revalidateSite();
+  revalidatePath(`/admin/secciones/${sectionId}`);
+  return { ok: true, message: "Video añadido." };
+}
+
+export async function deleteVideo(formData: FormData): Promise<void> {
+  await requireAdmin();
+  const video = await prisma.video.delete({ where: { id: String(formData.get("id")) } }).catch(() => null);
+  if (!video) return;
+  revalidateSite();
+  revalidatePath(`/admin/secciones/${video.sectionId}`);
+}
+
+/** Sube o baja un video dentro de su sección. */
+export async function moveVideo(formData: FormData): Promise<void> {
+  await requireAdmin();
+  const id = String(formData.get("id"));
+  const dir = formData.get("dir") === "up" ? -1 : 1;
+  const me = await prisma.video.findUnique({ where: { id } });
+  if (!me) return;
+  const all = await prisma.video.findMany({ where: { sectionId: me.sectionId }, orderBy: { order: "asc" } });
+  const idx = all.findIndex((v) => v.id === id);
+  const swap = idx + dir;
+  if (swap < 0 || swap >= all.length) return;
+  [all[idx], all[swap]] = [all[swap], all[idx]];
+  await prisma.$transaction(all.map((v, i) => prisma.video.update({ where: { id: v.id }, data: { order: i } })));
+  revalidateSite();
+  revalidatePath(`/admin/secciones/${me.sectionId}`);
 }
 
 /* ---------- Mensajes ---------- */

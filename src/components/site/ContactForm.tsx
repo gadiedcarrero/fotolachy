@@ -72,7 +72,7 @@ export default function ContactForm({ title, text, email, socials, whatsappHref,
               </select>
               <input name="location" placeholder={f.location} className="field" />
               <input name="date" placeholder={f.date} className="field" />
-              <input name="planner" placeholder={f.planner} className="field" />
+              <input name="phone" type="tel" autoComplete="tel" placeholder={f.phone} className="field" />
               <input name="instagram" placeholder={f.instagram} className="field md:col-span-2" />
               <textarea name="message" placeholder={f.message} rows={4} className="field md:col-span-2 resize-none" />
               {state && !state.ok && <p className="md:col-span-2 text-sm text-red-700">{state.message}</p>}

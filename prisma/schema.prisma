@@ -58,6 +58,7 @@ model Section {
   layout      String   @default("card")
   coverUrl    String? // foto que se muestra al pasar el mouse en el menú / tarjeta
   photos      Photo[]
+  videos      Video[]
   /// Sección padre (si esta sección es una "historia" dentro de otra)
   parentId    String?
   parent      Section?  @relation("SectionChildren", fields: [parentId], references: [id], onDelete: Cascade)
@@ -78,6 +79,17 @@ model Photo {
   createdAt DateTime @default(now())
 }
 
+/// Video de YouTube dentro de una sección. Solo se guarda el enlace; el video se reproduce desde YouTube.
+model Video {
+  id        String   @id @default(cuid())
+  youtubeId String
+  title     String   @default("")
+  order     Int      @default(0)
+  sectionId String
+  section   Section  @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+}
+
 /// Traducciones automáticas del contenido (se escribe en español en el panel).
 /// Se guardan para traducir cada texto una sola vez; id = hash del idioma + texto original.
 model Translation {
@@ -93,6 +105,7 @@ model Inquiry {
   id        String   @id @default(cuid())
   name      String
   email     String
+  phone     String?
   eventType String?
   location  String?
   date      String?

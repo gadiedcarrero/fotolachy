@@ -1,11 +1,11 @@
 import type { SiteSettings } from "@prisma/client";
 import type { MenuItem } from "@/components/site/MenuOverlay";
-import { sectionCover, type SectionTree } from "./data";
+import { hasContent, sectionCover, type SectionTree } from "./data";
 import type { Dict } from "./i18n";
 
 /** Ítems del menú: las secciones visibles repartidas arriba/abajo de la foto, más Nosotros y Contacto. */
 export function buildMenu(sections: SectionTree[], settings: SiteSettings, t: Dict): MenuItem[] {
-  const menuSections = sections.filter((s) => s.showInMenu);
+  const menuSections = visibleInMenu(sections);
   return [
     ...menuSections.map((s, i) => ({
       label: s.title,
@@ -16,6 +16,11 @@ export function buildMenu(sections: SectionTree[], settings: SiteSettings, t: Di
     { label: t.about, href: "/#nosotros", image: settings.aboutPhotoUrl, group: "secondary" },
     { label: t.contact, href: "/#contacto", image: settings.heroPhotoUrl, group: "secondary" },
   ];
+}
+
+/** Secciones del menú (y del pie): las marcadas para el menú que ya tienen fotos o videos. */
+export function visibleInMenu(sections: SectionTree[]): SectionTree[] {
+  return sections.filter((s) => s.showInMenu && hasContent(s));
 }
 
 export type SocialLink = { label: string; href: string };
