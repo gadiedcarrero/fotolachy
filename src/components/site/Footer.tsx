@@ -1,15 +1,16 @@
 import Image from "next/image";
 import Link from "next/link";
+import type { SocialLink } from "@/lib/menu";
 
 type Props = {
   siteName: string;
   email: string;
-  instagramUrl: string;
+  socials: SocialLink[];
   footerText: string;
   links: { label: string; href: string }[];
 };
 
-export default function Footer({ siteName, email, instagramUrl, footerText, links }: Props) {
+export default function Footer({ siteName, email, socials, footerText, links }: Props) {
   return (
     <footer className="bg-ink text-bg px-6 md:px-16 py-12">
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
@@ -27,9 +28,11 @@ export default function Footer({ siteName, email, instagramUrl, footerText, link
               {l.label}
             </Link>
           ))}
-          <a href={instagramUrl} target="_blank" rel="noreferrer" className="eyebrow hover:opacity-60 transition-opacity">
-            Instagram
-          </a>
+          {socials.map((s) => (
+            <a key={s.label} href={s.href} target="_blank" rel="noreferrer" className="eyebrow hover:opacity-60 transition-opacity">
+              {s.label}
+            </a>
+          ))}
         </nav>
       </div>
       <p className="mt-10 text-xs text-bg/60">

@@ -36,7 +36,12 @@ export default function SettingsForm({ s }: { s: SiteSettings }) {
         <Field label="Nombre del sitio (logo)" name="siteName" value={s.siteName} />
         <Field label="Tagline" name="tagline" value={s.tagline} />
         <Field label="Email de contacto" name="contactEmail" value={s.contactEmail} />
+      </Group>
+
+      <Group title="Redes sociales">
         <Field label="Instagram (URL)" name="instagramUrl" value={s.instagramUrl} />
+        <Field label="Facebook (URL)" name="facebookUrl" value={s.facebookUrl} />
+        <Field label="TikTok (URL)" name="tiktokUrl" value={s.tiktokUrl} hint="Deja vacía cualquier red que no quieras mostrar." />
       </Group>
 
       <Group title="WhatsApp">

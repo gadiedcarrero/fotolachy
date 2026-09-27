@@ -17,3 +17,14 @@ export function buildMenu(sections: SectionTree[], settings: SiteSettings, t: Di
     { label: t.contact, href: "/#contacto", image: settings.heroPhotoUrl, group: "secondary" },
   ];
 }
+
+export type SocialLink = { label: string; href: string };
+
+/** Redes sociales configuradas en el panel (las vacías no se muestran). */
+export function socialLinks(settings: SiteSettings): SocialLink[] {
+  return [
+    { label: "Instagram", href: settings.instagramUrl },
+    { label: "Facebook", href: settings.facebookUrl },
+    { label: "TikTok", href: settings.tiktokUrl },
+  ].filter((l) => /^https?:\/\/[^/]+\/./.test(l.href.trim()));
+}

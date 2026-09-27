@@ -13,7 +13,7 @@ import Reveal from "@/components/site/Reveal";
 import { getSections, getSettings, sectionCover } from "@/lib/data";
 import { getDict } from "@/lib/i18n";
 import { getLang } from "@/lib/lang";
-import { buildMenu } from "@/lib/menu";
+import { buildMenu, socialLinks } from "@/lib/menu";
 import { localizeContent } from "@/lib/translate";
 
 export const dynamic = "force-dynamic";
@@ -122,6 +122,7 @@ export default async function HomePage() {
           title={t.contactTitle}
           text={settings.contactText}
           email={settings.contactEmail}
+          socials={socialLinks(settings)}
           whatsappHref={whatsappLink(settings.whatsappNumber, settings.whatsappMessage)}
           lang={lang}
           t={t}
@@ -131,7 +132,7 @@ export default async function HomePage() {
       <Footer
         siteName={settings.siteName}
         email={settings.contactEmail}
-        instagramUrl={settings.instagramUrl}
+        socials={socialLinks(settings)}
         footerText={settings.footerText}
         links={menuSections.map((s) => ({ label: s.title, href: `/galeria/${s.slug}` }))}
       />

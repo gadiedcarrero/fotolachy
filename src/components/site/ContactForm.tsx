@@ -4,10 +4,19 @@ import { useActionState } from "react";
 import { sendInquiry, type ContactState } from "@/app/actions/contact";
 import Reveal from "./Reveal";
 import type { Dict, Lang } from "@/lib/i18n";
+import type { SocialLink } from "@/lib/menu";
 
-type Props = { title: string; text: string; email: string; whatsappHref?: string | null; lang: Lang; t: Dict };
+type Props = {
+  title: string;
+  text: string;
+  email: string;
+  socials: SocialLink[];
+  whatsappHref?: string | null;
+  lang: Lang;
+  t: Dict;
+};
 
-export default function ContactForm({ title, text, email, whatsappHref, lang, t }: Props) {
+export default function ContactForm({ title, text, email, socials, whatsappHref, lang, t }: Props) {
   const f = t.form;
   const [state, action, pending] = useActionState<ContactState, FormData>(sendInquiry, null);
 
@@ -21,6 +30,15 @@ export default function ContactForm({ title, text, email, whatsappHref, lang, t 
           <a href={`mailto:${email}`} className="mt-6 inline-block font-serif italic text-xl hover:opacity-60 transition-opacity">
             {email}
           </a>
+          {socials.length > 0 && (
+            <div className="mt-4 flex flex-wrap gap-x-6 gap-y-2">
+              {socials.map((s) => (
+                <a key={s.label} href={s.href} target="_blank" rel="noreferrer" className="eyebrow text-muted hover:text-ink transition-colors">
+                  {s.label}
+                </a>
+              ))}
+            </div>
+          )}
           {whatsappHref && (
             <div className="mt-10">
               <a href={whatsappHref} target="_blank" rel="noreferrer" className="btn-outline">

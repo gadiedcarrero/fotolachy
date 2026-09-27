@@ -9,7 +9,7 @@ import Reveal from "@/components/site/Reveal";
 import { getSectionBySlug, getSections, getSettings, sectionCover, type SectionDetail, type SectionTree } from "@/lib/data";
 import { getDict } from "@/lib/i18n";
 import { getLang } from "@/lib/lang";
-import { buildMenu } from "@/lib/menu";
+import { buildMenu, socialLinks } from "@/lib/menu";
 import { localizeContent, translateMany } from "@/lib/translate";
 import type { Metadata } from "next";
 
@@ -76,7 +76,7 @@ export default async function GalleryPage({ params }: PageProps<"/galeria/[slug]
       <Footer
         siteName={settings.siteName}
         email={settings.contactEmail}
-        instagramUrl={settings.instagramUrl}
+        socials={socialLinks(settings)}
         footerText={settings.footerText}
         links={menuSections.map((s) => ({ label: s.title, href: `/galeria/${s.slug}` }))}
       />
